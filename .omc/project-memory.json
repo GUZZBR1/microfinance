@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1777569728662,
+  "projectRoot": "/home/gusta/projetos/microfinance",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {},
+  "hotPaths": [
+    {
+      "path": "database/seeds/001_seed_test_data.sql",
+      "accessCount": 3,
+      "lastAccessed": 1777570783756,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 2,
+      "lastAccessed": 1777569901852,
+      "type": "file"
+    },
+    {
+      "path": "database/migrations/001_initial_schema.sql",
+      "accessCount": 2,
+      "lastAccessed": 1777570467282,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

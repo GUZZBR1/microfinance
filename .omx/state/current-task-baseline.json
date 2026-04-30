@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "branch_name": "main",
+      "worktree_path": "/home/gusta/projetos/microfinance",
+      "status": "active",
+      "created_at": "2026-04-30T17:22:23.131Z",
+      "updated_at": "2026-04-30T17:36:51.189Z"
+    }
+  ]
+}
