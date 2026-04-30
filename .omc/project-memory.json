@@ -50,6 +50,30 @@
       "accessCount": 2,
       "lastAccessed": 1777570467282,
       "type": "file"
+    },
+    {
+      "path": "database/queries/create_service.sql",
+      "accessCount": 2,
+      "lastAccessed": 1777571081656,
+      "type": "file"
+    },
+    {
+      "path": "database/queries/list_today.sql",
+      "accessCount": 2,
+      "lastAccessed": 1777571081858,
+      "type": "file"
+    },
+    {
+      "path": "database/queries/complete_service.sql",
+      "accessCount": 2,
+      "lastAccessed": 1777571082053,
+      "type": "file"
+    },
+    {
+      "path": "database/queries/list_pending.sql",
+      "accessCount": 2,
+      "lastAccessed": 1777571082258,
+      "type": "file"
     }
   ],
   "userDirectives": []

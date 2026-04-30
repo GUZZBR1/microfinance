@@ -1,5 +1,5 @@
 {
-  "lastSentAt": "2026-04-30T17:42:21.377Z",
-  "repoSignature": "{\"repo\":\"GUZZBR1/microfinance\",\"headSha\":\"c223bb2cc8d3a3a3291f23d0cd5e798406bd9748\",\"dirty\":true,\"openPrNumbers\":[],\"openIssueNumbers\":[],\"failingRunIds\":[]}",
-  "backlogZero": true
+  "lastSentAt": "2026-04-30T17:45:17.952Z",
+  "repoSignature": "{\"repo\":\"GUZZBR1/microfinance\",\"headSha\":\"b713d532fd34a77f78834f05ecf132aec4d546fc\",\"dirty\":true,\"openPrNumbers\":[4],\"openIssueNumbers\":[],\"failingRunIds\":[]}",
+  "backlogZero": false
 }
