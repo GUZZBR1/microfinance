@@ -1,0 +1,10 @@
+{
+  "session_id": "019ddf68-4549-7321-bfae-9316512b9ec3",
+  "native_session_id": "019ddf68-4549-7321-bfae-9316512b9ec3",
+  "started_at": "2026-04-30T17:21:32.275Z",
+  "cwd": "/home/gusta/projetos/microfinance",
+  "pid": 1157,
+  "platform": "linux",
+  "pid_start_ticks": 33761,
+  "pid_cmdline": "/home/gusta/.npm-global/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex"
+}
