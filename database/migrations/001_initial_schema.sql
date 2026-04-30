@@ -18,9 +18,9 @@ CREATE TABLE services (
     service_date date not null,
     service_time time,
     value numeric(10,2) not null default 0,
-    paid_amount numeric(10,2) default 0,
-    status text default 'agendado',
-    payment_status text default 'nao_pago',
+    paid_amount numeric(10,2) not null default 0,
+    status text not null default 'agendado',
+    payment_status text not null default 'nao_pago',
     created_at timestamptz default now()
 );
 
@@ -29,8 +29,8 @@ CREATE TABLE user_sessions (
     user_phone text primary key,
     pending_intent text,
     missing_fields text[],
-    retry_count integer default 0,
-    updated_at timestamptz default now()
+    retry_count integer not null default 0,
+    updated_at timestamptz not null default now()
 );
 
 -- Foreign key
