@@ -4,7 +4,7 @@ WITH payment_input AS (
     SELECT
         {{ $json.data.id }}::integer AS service_id,
         {{ $json.data.amount }}::numeric(10,2) AS payment_amount,
-        {{ $("WhatsApp Trigger").item.json.from }}::text AS user_phone
+        '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone
 ),
 calculated_payment AS (
     SELECT

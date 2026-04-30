@@ -8,5 +8,5 @@ SELECT
     COUNT(*) FILTER (WHERE status = 'feito') AS completed_services,
     COUNT(*) FILTER (WHERE payment_status IN ('nao_pago', 'parcial')) AS pending_payment_services
 FROM services
-WHERE user_phone = {{ $("WhatsApp Trigger").item.json.from }}
+WHERE user_phone = '{{ $("WhatsApp Trigger").item.json.from }}'
   AND service_date = CURRENT_DATE;
