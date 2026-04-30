@@ -10,6 +10,6 @@ SELECT
     status,
     payment_status
 FROM services
-WHERE user_phone = {{ $json.user_phone }}
+WHERE user_phone = '{{ $("WhatsApp Trigger").item.json.from }}'
   AND payment_status != 'pago'
 ORDER BY service_date ASC, service_time ASC NULLS LAST;
