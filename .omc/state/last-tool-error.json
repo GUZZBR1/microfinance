@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"git branch -d Schema-inicial Dados-teste\",\"description\":\"Delete local branches\"}",
-  "error": "Exit code 1\nwarning: deleting branch 'Schema-inicial' that has been merged to\n         'refs/remotes/origin/Schema-inicial', but not yet merged to HEAD\nerror: cannot delete branch 'Dados-teste' used by worktree at '/home/gusta/projetos/microfinance'\nDeleted branch Schema-inicial (was 1804424).",
-  "timestamp": "2026-04-30T17:42:05.028Z",
-  "retry_count": 1
-}

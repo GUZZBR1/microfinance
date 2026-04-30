@@ -25,6 +25,8 @@ Files reviewed:
 - `create_service.sql` handled optional date/time fields with raw expressions that could render invalid SQL when values were present or missing.
 - `create_service.sql` did not explicitly document that it is not idempotent.
 - `paid_amount`, `status`, `payment_status`, `retry_count`, and `updated_at` had defaults but were still nullable in the initial schema.
+- Runtime metadata under `.omx/` and `.omc/` was tracked by Git.
+- Seed data used realistic names and phone numbers.
 
 ## Fixes Applied
 
@@ -42,6 +44,11 @@ Files reviewed:
   - `payment_status not null default 'nao_pago'`
   - `retry_count not null default 0`
   - `updated_at not null default now()`
+- Removed `.omx/` and `.omc/` runtime metadata from Git tracking and added both paths to `.gitignore`.
+- Replaced seed names and phone numbers with clearly fake test data:
+  - `Cliente Teste 1` / `5500000000001`
+  - `Cliente Teste 2` / `5500000000002`
+  - `Cliente Teste 3` / `5500000000003`
 
 ## Checklist Result
 
@@ -58,7 +65,7 @@ Files reviewed:
 
 ## Remaining Notes / Risks
 
-- `database/seeds/001_seed_test_data.sql` intentionally deletes and recreates test data globally. It should only be run in development/test environments, not as an n8n runtime query.
+- `database/seeds/001_seed_test_data.sql` intentionally deletes and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query.
 - Text values are prepared for MVP n8n copy/paste usage. For production hardening, prefer n8n PostgreSQL query parameters over direct expression interpolation.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.
