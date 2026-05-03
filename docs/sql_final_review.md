@@ -45,6 +45,7 @@ Files reviewed:
   - `payment_status not null default 'nao_pago'`
   - `retry_count not null default 0`
   - `updated_at not null default now()`
+- Aligned session retry semantics so new or reset sessions start at `0`, and `increment_session_retry.sql` counts only actual retry attempts.
 - Removed `.omx/` and `.omc/` runtime metadata from Git tracking and added both paths to `.gitignore`.
 - Replaced seed names and phone numbers with clearly fake test data:
   - `Cliente Teste 1` / `5500000000001`
