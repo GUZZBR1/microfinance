@@ -27,13 +27,13 @@ INSERT INTO services (
     status,
     payment_status
 )
-SELECT
-    user_phone,
-    client_name,
-    description,
-    service_date,
-    service_time,
-    value,
+VALUES (
+    '{{ $("WhatsApp Trigger").item.json.from }}',
+    NULLIF($n8n${{ $json.client_name || "" }}$n8n$, ''),
+    NULLIF($n8n${{ $json.description || "" }}$n8n$, ''),
+    NULLIF(BTRIM('{{ $json.service_date || "" }}'), '')::date,
+    NULLIF('{{ $json.service_time || "" }}', '')::time,
+    {{ $json.value }}::numeric(10,2),
     0,
     'agendado',
     'nao_pago'
