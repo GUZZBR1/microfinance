@@ -22,20 +22,25 @@ Files reviewed:
 ## Issues Found
 
 - Some n8n text expressions were not quoted, which would make SQL invalid or unsafe to copy into PostgreSQL nodes.
+- Fixed `$n8n$...$n8n$` delimiters in runtime text/JSON interpolation were brittle because user content could collide with the chosen delimiter.
 - `create_service.sql` handled optional date/time fields with raw expressions that could render invalid SQL when values were present or missing.
 - `create_service.sql` did not explicitly document that it is not idempotent.
 - `paid_amount`, `status`, `payment_status`, `retry_count`, and `updated_at` had defaults but were still nullable in the initial schema.
+- `list_pending.sql` could include future `agendado` services as pending payments, even though receivables should only come from completed work.
 - Runtime metadata under `.omx/` and `.omc/` was tracked by Git.
 - Seed data used realistic names and phone numbers.
 
 ## Fixes Applied
 
 - Updated runtime service queries to use `{{ $("WhatsApp Trigger").item.json.from }}` as the source of `user_phone`.
+- Hardened `create_service.sql` so `user_phone`, `service_date`, `service_time`, and `value` go through JSON-backed extraction before trimming/casting, instead of relying on raw scalar interpolation.
+- Bootstrapped `users(phone)` inside `create_service.sql` before inserting into `services`, so first-time WhatsApp numbers satisfy the foreign key.
 - Quoted text/date/time n8n expressions correctly for PostgreSQL execution.
+- Replaced fixed `$n8n$...$n8n$` delimiters with single-quoted JSON/text interpolation that escapes apostrophes before PostgreSQL casting/extraction.
 - Added safe optional handling for:
   - `description`
-  - `service_date`
   - `service_time`
+- Kept `service_date` mandatory in `create_service.sql`; blank or missing values now fail visibly instead of silently defaulting to `CURRENT_DATE`.
 - Cast numeric fields as numeric/integer where appropriate.
 - Documented `create_service.sql` as non-idempotent.
 - Tightened schema nullability for payment state and session retry metadata:
@@ -44,32 +49,49 @@ Files reviewed:
   - `payment_status not null default 'nao_pago'`
   - `retry_count not null default 0`
   - `updated_at not null default now()`
+- Added a schema payment-state constraint so scheduled services remain unpaid (`paid_amount = 0` and `payment_status = 'nao_pago'`) until completed.
+- Restricted `register_payment.sql`, `list_pending.sql`, and pending-payment financial summary counts to completed services.
+- Aligned session retry semantics so new or reset sessions start at `0`, and `increment_session_retry.sql` counts only actual retry attempts.
 - Removed `.omx/` and `.omc/` runtime metadata from Git tracking and added both paths to `.gitignore`.
 - Replaced seed names and phone numbers with clearly fake test data:
   - `Cliente Teste 1` / `5500000000001`
   - `Cliente Teste 2` / `5500000000002`
   - `Cliente Teste 3` / `5500000000003`
+- Made `database/seeds/001_seed_test_data.sql` rerunnable with an explicit `TRUNCATE services, user_sessions, users RESTART IDENTITY` order so development/test reseeds recreate deterministic serial IDs without relying on `CASCADE`.
 
 ## Checklist Result
 
 - User isolation: runtime SELECT/UPDATE/DELETE queries filter by `user_phone`.
 - Schema: constraints validate phone/client fields, service values, paid amount bounds, service status, and payment status.
-- Payments: partial/full payments are supported; invalid non-positive payments are ignored; `LEAST()` prevents overpayment; `CASE` derives payment status.
+- Payments: partial/full payments are supported for completed services; invalid non-positive payments are ignored; `LEAST()` prevents overpayment; `CASE` derives payment status.
 - Idempotency:
   - SELECT queries are idempotent.
   - `create_service.sql` is intentionally not idempotent.
   - `complete_service.sql` is conditionally idempotent with `status != 'feito'`.
   - `clear_session.sql` can be safely repeated.
-- n8n compatibility: text values are quoted or dollar-quoted, numeric values remain unquoted and cast, optional fields are handled.
+- n8n compatibility: text values are single-quoted with apostrophe escaping or JSON-cast, numeric values are cast after query-level preparation, and optional fields are handled.
 - MVP simplicity: no new tables, triggers, functions, ORM assumptions, backend API assumptions, or n8n Data Tables.
 
 ## Remaining Notes / Risks
 
-- `database/seeds/001_seed_test_data.sql` intentionally deletes and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query.
-- Text values are prepared for MVP n8n copy/paste usage. For production hardening, prefer n8n PostgreSQL query parameters over direct expression interpolation.
+- `database/seeds/001_seed_test_data.sql` intentionally truncates and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query. The current explicit truncate order matches the schema review (`services` FK -> `users`; `user_sessions` has no FK); revisit it before adding new foreign keys to these tables.
+- Runtime text/JSON interpolation no longer depends on a fixed dollar-quote delimiter, but n8n PostgreSQL query parameters are still preferred over direct interpolation whenever node configuration allows them.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.
+- `create_service.sql` now requires a non-blank `service_date`; blank/missing values surface a database error instead of creating a service for the wrong day.
 
-## n8n Readiness
+## Verification Evidence
 
-The SQL is ready for MVP n8n PostgreSQL node integration, with the seed file reserved for local/test setup only.
+Verified in-repo evidence:
+
+- Static review of the schema, seeds, and runtime SQL files listed above.
+- Behavioral contract confirmation from the SQL itself:
+  - `create_service.sql` requires a non-blank `service_date`.
+  - `retry_count` starts at `0` and increments only on retry updates.
+  - Pending-payment queries exclude future scheduled work and only collect receivables from completed services.
+  - `database/seeds/001_seed_test_data.sql` is for development/test reseeding only.
+- Repository evidence does **not** currently include a committed PostgreSQL smoke test, n8n end-to-end run, automated SQL test suite, or SQL linter/typecheck pipeline.
+
+## Readiness Caveat
+
+This review removes the known SQL blockers found in the inspected files, but it is not sufficient evidence to claim end-to-end n8n/PostgreSQL readiness on its own. A live PostgreSQL smoke test and n8n workflow exercise are still required before making a stronger readiness claim.

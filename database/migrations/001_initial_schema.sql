@@ -74,6 +74,13 @@ ALTER TABLE services
     ADD CONSTRAINT chk_services_payment_status_valid
     CHECK (payment_status IN ('nao_pago', 'parcial', 'pago'));
 
+ALTER TABLE services
+    ADD CONSTRAINT chk_services_payment_state_matches_status
+    CHECK (
+        status <> 'agendado'
+        OR (paid_amount = 0 AND payment_status = 'nao_pago')
+    );
+
 -- Indexes
 CREATE INDEX idx_services_user_phone ON services(user_phone);
 CREATE INDEX idx_services_user_date ON services(user_phone, service_date);
