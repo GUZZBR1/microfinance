@@ -49,30 +49,32 @@ Files reviewed:
   - `payment_status not null default 'nao_pago'`
   - `retry_count not null default 0`
   - `updated_at not null default now()`
+- Added a schema payment-state constraint so scheduled services remain unpaid (`paid_amount = 0` and `payment_status = 'nao_pago'`) until completed.
+- Restricted `register_payment.sql`, `list_pending.sql`, and pending-payment financial summary counts to completed services.
 - Aligned session retry semantics so new or reset sessions start at `0`, and `increment_session_retry.sql` counts only actual retry attempts.
 - Removed `.omx/` and `.omc/` runtime metadata from Git tracking and added both paths to `.gitignore`.
 - Replaced seed names and phone numbers with clearly fake test data:
   - `Cliente Teste 1` / `5500000000001`
   - `Cliente Teste 2` / `5500000000002`
   - `Cliente Teste 3` / `5500000000003`
-- Made `database/seeds/001_seed_test_data.sql` rerunnable with `TRUNCATE ... RESTART IDENTITY CASCADE` so development/test reseeds recreate deterministic serial IDs.
+- Made `database/seeds/001_seed_test_data.sql` rerunnable with an explicit `TRUNCATE services, user_sessions, users RESTART IDENTITY` order so development/test reseeds recreate deterministic serial IDs without relying on `CASCADE`.
 
 ## Checklist Result
 
 - User isolation: runtime SELECT/UPDATE/DELETE queries filter by `user_phone`.
 - Schema: constraints validate phone/client fields, service values, paid amount bounds, service status, and payment status.
-- Payments: partial/full payments are supported; invalid non-positive payments are ignored; `LEAST()` prevents overpayment; `CASE` derives payment status.
+- Payments: partial/full payments are supported for completed services; invalid non-positive payments are ignored; `LEAST()` prevents overpayment; `CASE` derives payment status.
 - Idempotency:
   - SELECT queries are idempotent.
   - `create_service.sql` is intentionally not idempotent.
   - `complete_service.sql` is conditionally idempotent with `status != 'feito'`.
   - `clear_session.sql` can be safely repeated.
-- n8n compatibility: text values are single-quoted with apostrophe escaping or JSON-cast, numeric values remain unquoted and cast, optional fields are handled.
+- n8n compatibility: text values are single-quoted with apostrophe escaping or JSON-cast, numeric values are cast after query-level preparation, and optional fields are handled.
 - MVP simplicity: no new tables, triggers, functions, ORM assumptions, backend API assumptions, or n8n Data Tables.
 
 ## Remaining Notes / Risks
 
-- `database/seeds/001_seed_test_data.sql` intentionally truncates and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query.
+- `database/seeds/001_seed_test_data.sql` intentionally truncates and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query. The explicit truncate order matches the current schema review (`services` references `users`; `user_sessions` has no foreign keys); revisit it before adding new foreign keys to these tables.
 - Runtime text/JSON interpolation no longer depends on a fixed dollar-quote delimiter, but n8n PostgreSQL query parameters are still preferred over direct interpolation whenever node configuration allows them.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.

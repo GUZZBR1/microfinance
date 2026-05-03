@@ -1,6 +1,7 @@
 -- Seed test data for WhatsApp MVP
--- Cleanup first (safe to re-run in development/test)
-TRUNCATE TABLE services, user_sessions, users RESTART IDENTITY CASCADE;
+-- Cleanup first (safe to re-run in development/test only).
+-- Ordered explicitly to avoid TRUNCATE ... CASCADE: services depends on users; user_sessions has no foreign keys.
+TRUNCATE TABLE services, user_sessions, users RESTART IDENTITY;
 
 -- ============================================
 -- USERS

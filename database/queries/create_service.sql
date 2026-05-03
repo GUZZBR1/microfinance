@@ -13,9 +13,10 @@ service_input AS (
         NULLIF(BTRIM(r.user_phone_raw), '') AS user_phone,
         NULLIF('{{ JSON.stringify($json.client_name || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS client_name,
         NULLIF('{{ JSON.stringify($json.description || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS description,
-        NULLIF(BTRIM('{{ $json.service_date || "" }}'), '')::date AS service_date,
-        NULLIF(BTRIM('{{ $json.service_time || "" }}'), '')::time AS service_time,
-        {{ $json.value }}::numeric(10,2) AS value
+        NULLIF(BTRIM(r.service_date_raw), '')::date AS service_date,
+        NULLIF(BTRIM(r.service_time_raw), '')::time AS service_time,
+        NULLIF(BTRIM(r.value_raw), '')::numeric(10,2) AS value
+    FROM raw_service_input r
 ),
 bootstrap_user AS (
     INSERT INTO users (phone)
