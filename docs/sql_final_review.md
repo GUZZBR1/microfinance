@@ -31,6 +31,7 @@ Files reviewed:
 ## Fixes Applied
 
 - Updated runtime service queries to use `{{ $("WhatsApp Trigger").item.json.from }}` as the source of `user_phone`.
+- Bootstrapped `users(phone)` inside `create_service.sql` before inserting into `services`, so first-time WhatsApp numbers satisfy the foreign key.
 - Quoted text/date/time n8n expressions correctly for PostgreSQL execution.
 - Added safe optional handling for:
   - `description`
