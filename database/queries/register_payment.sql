@@ -17,6 +17,7 @@ calculated_payment AS (
       ON p.service_id = s.id
      AND p.user_phone = s.user_phone
     WHERE p.payment_amount > 0
+      AND s.status = 'feito'
 )
 UPDATE services s
 SET
