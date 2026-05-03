@@ -25,6 +25,7 @@ Files reviewed:
 - `create_service.sql` handled optional date/time fields with raw expressions that could render invalid SQL when values were present or missing.
 - `create_service.sql` did not explicitly document that it is not idempotent.
 - `paid_amount`, `status`, `payment_status`, `retry_count`, and `updated_at` had defaults but were still nullable in the initial schema.
+- `list_pending.sql` could include future `agendado` services as pending payments, even though receivables should only come from completed work.
 - Runtime metadata under `.omx/` and `.omc/` was tracked by Git.
 - Seed data used realistic names and phone numbers.
 
@@ -45,7 +46,7 @@ Files reviewed:
   - `payment_status not null default 'nao_pago'`
   - `retry_count not null default 0`
   - `updated_at not null default now()`
-- Aligned session retry semantics so new or reset sessions start at `0`, and `increment_session_retry.sql` counts only actual retry attempts.
+- Restricted `list_pending.sql` to completed services (`status = 'feito'`) so future scheduled jobs do not appear as receivables.
 - Removed `.omx/` and `.omc/` runtime metadata from Git tracking and added both paths to `.gitignore`.
 - Replaced seed names and phone numbers with clearly fake test data:
   - `Cliente Teste 1` / `5500000000001`
@@ -64,6 +65,7 @@ Files reviewed:
   - `complete_service.sql` is conditionally idempotent with `status != 'feito'`.
   - `clear_session.sql` can be safely repeated.
 - n8n compatibility: text values are quoted or dollar-quoted, numeric values remain unquoted and cast, optional fields are handled.
+- Pending payments semantics: only completed services with `payment_status != 'pago'` are treated as receivables.
 - MVP simplicity: no new tables, triggers, functions, ORM assumptions, backend API assumptions, or n8n Data Tables.
 
 ## Remaining Notes / Risks
@@ -77,4 +79,4 @@ Files reviewed:
 
 ## n8n Readiness
 
-The SQL is ready for MVP n8n PostgreSQL node integration, with the seed file reserved for local/test setup only.
+The SQL is ready for MVP n8n PostgreSQL node integration, including pending-payment semantics that exclude future scheduled services from receivables.

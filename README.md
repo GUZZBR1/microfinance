@@ -12,7 +12,7 @@ Features:
 - View today's agenda
 - Mark service as completed
 - Register payment
-- View pending payments
+- View pending payments for completed services only
 
 Rules:
 - Do not create any additional files or folders
