@@ -3,7 +3,12 @@
 -- Not idempotent: each execution creates a new service row
 WITH service_input AS (
     SELECT
-        '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone
+        '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone,
+        NULLIF('{{ JSON.stringify($json.client_name || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS client_name,
+        NULLIF('{{ JSON.stringify($json.description || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS description,
+        COALESCE(NULLIF('{{ $json.service_date || "" }}', '')::date, CURRENT_DATE) AS service_date,
+        NULLIF('{{ $json.service_time || "" }}', '')::time AS service_time,
+        {{ $json.value }}::numeric(10,2) AS value
 ),
 bootstrap_user AS (
     INSERT INTO users (phone)
