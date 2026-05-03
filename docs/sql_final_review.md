@@ -33,6 +33,7 @@ Files reviewed:
 ## Fixes Applied
 
 - Updated runtime service queries to use `{{ $("WhatsApp Trigger").item.json.from }}` as the source of `user_phone`.
+- Hardened `create_service.sql` so `user_phone`, `service_date`, `service_time`, and `value` go through JSON-backed extraction before trimming/casting, instead of relying on raw scalar interpolation.
 - Bootstrapped `users(phone)` inside `create_service.sql` before inserting into `services`, so first-time WhatsApp numbers satisfy the foreign key.
 - Quoted text/date/time n8n expressions correctly for PostgreSQL execution.
 - Replaced fixed `$n8n$...$n8n$` delimiters with single-quoted JSON/text interpolation that escapes apostrophes before PostgreSQL casting/extraction.
@@ -77,6 +78,18 @@ Files reviewed:
 - `clear_session.sql` should be called after successful completion or cancellation.
 - `create_service.sql` now requires a non-blank `service_date`; blank/missing values surface a database error instead of creating a service for the wrong day.
 
-## n8n Readiness
+## Verification Evidence
 
-The SQL is ready for MVP n8n PostgreSQL node integration, including pending-payment semantics that exclude future scheduled services from receivables.
+Verified in-repo evidence:
+
+- Static review of the schema, seeds, and runtime SQL files listed above.
+- Behavioral contract confirmation from the SQL itself:
+  - `create_service.sql` requires a non-blank `service_date`.
+  - `retry_count` starts at `0` and increments only on retry updates.
+  - Pending-payment queries exclude future scheduled work and only collect receivables from completed services.
+  - `database/seeds/001_seed_test_data.sql` is for development/test reseeding only.
+- Repository evidence does **not** currently include a committed PostgreSQL smoke test, n8n end-to-end run, automated SQL test suite, or SQL linter/typecheck pipeline.
+
+## Readiness Caveat
+
+This review removes the known SQL blockers found in the inspected files, but it is not sufficient evidence to claim end-to-end n8n/PostgreSQL readiness on its own. A live PostgreSQL smoke test and n8n workflow exercise are still required before making a stronger readiness claim.
