@@ -3,12 +3,7 @@
 -- Not idempotent: each execution creates a new service row
 WITH service_input AS (
     SELECT
-        '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone,
-        NULLIF('{{ JSON.stringify($json.client_name || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS client_name,
-        NULLIF('{{ JSON.stringify($json.description || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS description,
-        NULLIF(BTRIM('{{ $json.service_date || "" }}'), '')::date AS service_date,
-        NULLIF('{{ $json.service_time || "" }}', '')::time AS service_time,
-        {{ $json.value }}::numeric(10,2) AS value
+        '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone
 ),
 bootstrap_user AS (
     INSERT INTO users (phone)
@@ -29,13 +24,13 @@ INSERT INTO services (
     status,
     payment_status
 )
-SELECT
-    b.phone,
-    s.client_name,
-    s.description,
-    s.service_date,
-    s.service_time,
-    s.value,
+VALUES (
+    '{{ $("WhatsApp Trigger").item.json.from }}',
+    NULLIF('{{ JSON.stringify($json.client_name || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}',
+    NULLIF('{{ JSON.stringify($json.description || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}',
+    NULLIF('{{ $json.service_date || "" }}', '')::date,
+    NULLIF('{{ $json.service_time || "" }}', '')::time,
+    {{ $json.value }}::numeric(10,2),
     0,
     'agendado',
     'nao_pago'
