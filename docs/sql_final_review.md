@@ -67,6 +67,7 @@ Files reviewed:
 
 - `database/seeds/001_seed_test_data.sql` intentionally deletes and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query.
 - Text values are prepared for MVP n8n copy/paste usage. For production hardening, prefer n8n PostgreSQL query parameters over direct expression interpolation.
+- `retry_count` starts at `0`, resets to `0` when `reset_retry` is true, and `increment_session_retry.sql` increments only actual retry attempts.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.
 - `create_service.sql` now requires a non-blank `service_date`; blank/missing values surface a database error instead of creating a service for the wrong day.

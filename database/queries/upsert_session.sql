@@ -13,14 +13,12 @@ INSERT INTO user_sessions (
     user_phone,
     pending_intent,
     missing_fields,
-    retry_count,
     updated_at
 )
 SELECT
     user_phone,
     pending_intent,
     missing_fields,
-    1,
     now()
 FROM session_input
 ON CONFLICT (user_phone) DO UPDATE
@@ -28,8 +26,8 @@ SET
     pending_intent = EXCLUDED.pending_intent,
     missing_fields = EXCLUDED.missing_fields,
     retry_count = CASE
-        WHEN (SELECT reset_retry FROM session_input) THEN 1
-        ELSE user_sessions.retry_count
+        WHEN (SELECT reset_retry FROM session_input) THEN 0
+        ELSE COALESCE(user_sessions.retry_count, 0)
     END,
     updated_at = now()
 RETURNING
