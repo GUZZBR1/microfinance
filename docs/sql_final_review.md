@@ -22,6 +22,7 @@ Files reviewed:
 ## Issues Found
 
 - Some n8n text expressions were not quoted, which would make SQL invalid or unsafe to copy into PostgreSQL nodes.
+- Fixed `$n8n$...$n8n$` delimiters in runtime text/JSON interpolation were brittle because user content could collide with the chosen delimiter.
 - `create_service.sql` handled optional date/time fields with raw expressions that could render invalid SQL when values were present or missing.
 - `create_service.sql` did not explicitly document that it is not idempotent.
 - `paid_amount`, `status`, `payment_status`, `retry_count`, and `updated_at` had defaults but were still nullable in the initial schema.
@@ -34,6 +35,7 @@ Files reviewed:
 - Updated runtime service queries to use `{{ $("WhatsApp Trigger").item.json.from }}` as the source of `user_phone`.
 - Bootstrapped `users(phone)` inside `create_service.sql` before inserting into `services`, so first-time WhatsApp numbers satisfy the foreign key.
 - Quoted text/date/time n8n expressions correctly for PostgreSQL execution.
+- Replaced fixed `$n8n$...$n8n$` delimiters with single-quoted JSON/text interpolation that escapes apostrophes before PostgreSQL casting/extraction.
 - Added safe optional handling for:
   - `description`
   - `service_time`
@@ -64,15 +66,13 @@ Files reviewed:
   - `create_service.sql` is intentionally not idempotent.
   - `complete_service.sql` is conditionally idempotent with `status != 'feito'`.
   - `clear_session.sql` can be safely repeated.
-- n8n compatibility: text values are quoted or dollar-quoted, numeric values remain unquoted and cast, optional fields are handled.
-- Pending payments semantics: only completed services with `payment_status != 'pago'` are treated as receivables.
+- n8n compatibility: text values are single-quoted with apostrophe escaping or JSON-cast, numeric values remain unquoted and cast, optional fields are handled.
 - MVP simplicity: no new tables, triggers, functions, ORM assumptions, backend API assumptions, or n8n Data Tables.
 
 ## Remaining Notes / Risks
 
-- `database/seeds/001_seed_test_data.sql` intentionally truncates and recreates fake test data globally, resetting serial identities on every run. It should only be run in development/test environments, not as an n8n runtime query.
-- Text values are prepared for MVP n8n copy/paste usage. For production hardening, prefer n8n PostgreSQL query parameters over direct expression interpolation.
-- `retry_count` starts at `0`, resets to `0` when `reset_retry` is true, and `increment_session_retry.sql` increments only actual retry attempts.
+- `database/seeds/001_seed_test_data.sql` intentionally deletes and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query.
+- Runtime text/JSON interpolation no longer depends on a fixed dollar-quote delimiter, but n8n PostgreSQL query parameters are still preferred over direct interpolation whenever node configuration allows them.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.
 - `create_service.sql` now requires a non-blank `service_date`; blank/missing values surface a database error instead of creating a service for the wrong day.

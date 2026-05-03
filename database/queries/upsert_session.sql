@@ -3,9 +3,9 @@
 WITH session_input AS (
     SELECT
         '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone,
-        NULLIF($n8n${{ $json.pending_intent || "" }}$n8n$, '')::text AS pending_intent,
+        NULLIF('{{ JSON.stringify($json.pending_intent || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}' AS pending_intent,
         ARRAY(
-            SELECT jsonb_array_elements_text($n8n${{ JSON.stringify($json.missing_fields || []) }}$n8n$::jsonb)
+            SELECT jsonb_array_elements_text('{{ JSON.stringify($json.missing_fields || []).replace(/'/g, "''") }}'::jsonb)
         )::text[] AS missing_fields,
         {{ $json.reset_retry || false }}::boolean AS reset_retry
 )

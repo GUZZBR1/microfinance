@@ -29,9 +29,9 @@ INSERT INTO services (
 )
 VALUES (
     '{{ $("WhatsApp Trigger").item.json.from }}',
-    NULLIF($n8n${{ $json.client_name || "" }}$n8n$, ''),
-    NULLIF($n8n${{ $json.description || "" }}$n8n$, ''),
-    NULLIF(BTRIM('{{ $json.service_date || "" }}'), '')::date,
+    NULLIF('{{ JSON.stringify($json.client_name || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}',
+    NULLIF('{{ JSON.stringify($json.description || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}',
+    COALESCE(NULLIF('{{ $json.service_date || "" }}', '')::date, CURRENT_DATE),
     NULLIF('{{ $json.service_time || "" }}', '')::time,
     {{ $json.value }}::numeric(10,2),
     0,
