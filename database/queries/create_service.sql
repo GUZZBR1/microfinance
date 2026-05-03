@@ -6,7 +6,7 @@ WITH service_input AS (
         '{{ $("WhatsApp Trigger").item.json.from }}'::text AS user_phone,
         NULLIF($n8n${{ $json.client_name || "" }}$n8n$, '')::text AS client_name,
         NULLIF($n8n${{ $json.description || "" }}$n8n$, '')::text AS description,
-        COALESCE(NULLIF('{{ $json.service_date || "" }}', '')::date, CURRENT_DATE) AS service_date,
+        NULLIF('{{ $json.service_date || "" }}', '')::date AS service_date,
         NULLIF('{{ $json.service_time || "" }}', '')::time AS service_time,
         {{ $json.value }}::numeric(10,2) AS value
 ),
@@ -31,7 +31,7 @@ VALUES (
     '{{ $("WhatsApp Trigger").item.json.from }}',
     NULLIF('{{ JSON.stringify($json.client_name || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}',
     NULLIF('{{ JSON.stringify($json.description || "").replace(/'/g, "''") }}', '""')::jsonb #>> '{}',
-    COALESCE(NULLIF('{{ $json.service_date || "" }}', '')::date, CURRENT_DATE),
+    NULLIF('{{ $json.service_date || "" }}', '')::date,
     NULLIF('{{ $json.service_time || "" }}', '')::time,
     {{ $json.value }}::numeric(10,2),
     0,
