@@ -1,8 +1,6 @@
 -- Seed test data for WhatsApp MVP
--- Cleanup first (safe to re-run)
-DELETE FROM services;
-DELETE FROM user_sessions;
-DELETE FROM users;
+-- Cleanup first (safe to re-run in development/test)
+TRUNCATE TABLE services, user_sessions, users RESTART IDENTITY CASCADE;
 
 -- ============================================
 -- USERS
