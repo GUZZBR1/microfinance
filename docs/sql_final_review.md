@@ -34,8 +34,8 @@ Files reviewed:
 - Quoted text/date/time n8n expressions correctly for PostgreSQL execution.
 - Added safe optional handling for:
   - `description`
-  - `service_date`
   - `service_time`
+- Kept `service_date` mandatory in `create_service.sql`; blank or missing values now fail visibly instead of silently defaulting to `CURRENT_DATE`.
 - Cast numeric fields as numeric/integer where appropriate.
 - Documented `create_service.sql` as non-idempotent.
 - Tightened schema nullability for payment state and session retry metadata:
@@ -69,6 +69,7 @@ Files reviewed:
 - Text values are prepared for MVP n8n copy/paste usage. For production hardening, prefer n8n PostgreSQL query parameters over direct expression interpolation.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.
+- `create_service.sql` now requires a non-blank `service_date`; blank/missing values surface a database error instead of creating a service for the wrong day.
 
 ## n8n Readiness
 
