@@ -74,7 +74,7 @@ Files reviewed:
 
 ## Remaining Notes / Risks
 
-- `database/seeds/001_seed_test_data.sql` intentionally truncates and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query. The explicit truncate order matches the current schema review (`services` references `users`; `user_sessions` has no foreign keys); revisit it before adding new foreign keys to these tables.
+- `database/seeds/001_seed_test_data.sql` intentionally truncates and recreates fake test data globally. It should only be run in development/test environments, not as an n8n runtime query. The current explicit truncate order matches the schema review (`services` FK -> `users`; `user_sessions` has no FK); revisit it before adding new foreign keys to these tables.
 - Runtime text/JSON interpolation no longer depends on a fixed dollar-quote delimiter, but n8n PostgreSQL query parameters are still preferred over direct interpolation whenever node configuration allows them.
 - n8n should stop or cancel the AI retry flow when `retry_count >= 2`.
 - `clear_session.sql` should be called after successful completion or cancellation.
