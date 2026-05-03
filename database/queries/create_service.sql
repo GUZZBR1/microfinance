@@ -21,9 +21,17 @@ bootstrap_user AS (
     INSERT INTO users (phone)
     SELECT user_phone
     FROM service_input
-    ON CONFLICT (phone) DO UPDATE
-    SET phone = EXCLUDED.phone
+    ON CONFLICT (phone) DO NOTHING
     RETURNING phone
+),
+resolved_user AS (
+    SELECT phone
+    FROM bootstrap_user
+    UNION ALL
+    SELECT u.phone
+    FROM users u
+    JOIN service_input s ON u.phone = s.user_phone
+    WHERE NOT EXISTS (SELECT 1 FROM bootstrap_user)
 )
 INSERT INTO services (
     user_phone,
@@ -47,5 +55,5 @@ SELECT
     'agendado',
     'nao_pago'
 FROM service_input s
-JOIN bootstrap_user b ON b.phone = s.user_phone
+JOIN resolved_user b ON b.phone = s.user_phone
 RETURNING id, client_name, service_date, service_time, value, status;
