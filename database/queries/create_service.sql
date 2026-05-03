@@ -16,7 +16,7 @@ VALUES (
     '{{ $("WhatsApp Trigger").item.json.from }}',
     NULLIF($n8n${{ $json.client_name || "" }}$n8n$, ''),
     NULLIF($n8n${{ $json.description || "" }}$n8n$, ''),
-    COALESCE(NULLIF('{{ $json.service_date || "" }}', '')::date, CURRENT_DATE),
+    NULLIF(BTRIM('{{ $json.service_date || "" }}'), '')::date,
     NULLIF('{{ $json.service_time || "" }}', '')::time,
     {{ $json.value }}::numeric(10,2),
     0,
